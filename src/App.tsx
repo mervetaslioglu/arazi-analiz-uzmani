@@ -7,6 +7,11 @@ import Index from "./pages/Index.tsx";
 import NewProject from "./pages/NewProject.tsx";
 import ProjectDetail from "./pages/ProjectDetail.tsx";
 import Report from "./pages/Report.tsx";
+import Projects from "./pages/Projects.tsx";
+import Process from "./pages/Process.tsx";
+import RiskMatrix from "./pages/RiskMatrix.tsx";
+import Reports from "./pages/Reports.tsx";
+import Settings from "./pages/Settings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -20,6 +25,11 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/yeni" element={<NewProject />} />
+          <Route path="/surec" element={<Process />} />
+          <Route path="/projeler" element={<Projects />} />
+          <Route path="/risk" element={<RiskMatrix />} />
+          <Route path="/raporlar" element={<Reports />} />
+          <Route path="/ayarlar" element={<Settings />} />
           <Route path="/proje/:id" element={<ProjectDetail />} />
           <Route path="/proje/:id/rapor" element={<Report />} />
           <Route path="*" element={<NotFound />} />
