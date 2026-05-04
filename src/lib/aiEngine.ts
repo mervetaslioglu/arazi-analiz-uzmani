@@ -30,7 +30,6 @@ function f1(i: LandInput) {
       "Şehir": i.city,
       "İlçe": i.district,
       "Parsel Alanı": `${fmt(i.area)} m²`,
-      "Yol Cephesi": `${fmt(i.roadFront)} m`,
       "Köşe Parsel": i.cornerPlot ? "Evet" : "Hayır",
       "Topografya": { duz: "Düz", egimli: "Eğimli", "cok-egimli": "Çok Eğimli" }[i.topography],
     },
