@@ -35,7 +35,6 @@ function f1(i: LandInput) {
     },
     dogrulama: [
       "✓ Parsel alanı doğrulandı",
-      "✓ Yol cephesi imar koşullarına uygun",
       i.cornerPlot ? "✓ Köşe parsel — ekstra cephe avantajı" : "• Tek cepheli parsel",
       "✓ Topografya verisi kaydedildi",
     ],
