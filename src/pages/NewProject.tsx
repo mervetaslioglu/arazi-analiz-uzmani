@@ -46,6 +46,8 @@ const NewProject = () => {
     suiteOdaM2: 0,
     otelKategori: "",
     otelHedefM2: 0,
+    zoningDocs: [],
+    planNoteDocs: [],
   });
 
   const update = <K extends keyof LandInput>(key: K, value: LandInput[K]) => {
