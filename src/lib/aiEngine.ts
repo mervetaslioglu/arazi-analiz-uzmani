@@ -30,13 +30,11 @@ function f1(i: LandInput) {
       "Şehir": i.city,
       "İlçe": i.district,
       "Parsel Alanı": `${fmt(i.area)} m²`,
-      "Yol Cephesi": `${fmt(i.roadFront)} m`,
       "Köşe Parsel": i.cornerPlot ? "Evet" : "Hayır",
       "Topografya": { duz: "Düz", egimli: "Eğimli", "cok-egimli": "Çok Eğimli" }[i.topography],
     },
     dogrulama: [
       "✓ Parsel alanı doğrulandı",
-      "✓ Yol cephesi imar koşullarına uygun",
       i.cornerPlot ? "✓ Köşe parsel — ekstra cephe avantajı" : "• Tek cepheli parsel",
       "✓ Topografya verisi kaydedildi",
     ],
@@ -83,13 +81,11 @@ function f3(i: LandInput) {
       "İstinat Duvarı İhtiyacı": i.topography === "cok-egimli" ? "Gerekli" : "Sınırlı",
     },
     altyapi: {
-      "Yol Erişimi": `${fmt(i.roadFront)} m cephe — ${i.roadFront >= 10 ? "İyi" : "Orta"}`,
       "Altyapı Durumu": altyapi,
       "Otopark Yaklaşımı": i.cornerPlot ? "Çift cepheden mümkün" : "Tek cepheden",
     },
     riskler: [
       i.topography === "cok-egimli" ? "⚠ Yüksek eğim — temel mühendisliği kritik" : "✓ Temel sistemi standart",
-      i.roadFront < 8 ? "⚠ Dar cephe — otopark girişi optimize edilmeli" : "✓ Cephe yeterli",
       "✓ Güneşlenme kuzey-güney aksında ideal",
     ],
   };
