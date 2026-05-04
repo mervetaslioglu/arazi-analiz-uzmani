@@ -14,6 +14,7 @@ const NewProject = () => {
     city: "",
     district: "",
     area: 1000,
+    projectType: "Konut",
     zoningType: "Konut",
     emsal: 1.5,
     taks: 0.3,
@@ -22,6 +23,28 @@ const NewProject = () => {
     topography: "duz",
     cornerPlot: false,
     notes: "",
+    // İmar Durumu ek alanlar
+    imarNiteligi: "",
+    maxKat: 8,
+    imarTarih: "",
+    cekmeOn: 5,
+    cekmeYan: 3,
+    cekmeArka: 3,
+    planNotu: "",
+    // Konut alanları
+    konutAdedi: 0,
+    konut1p1: 0,
+    konut2p1: 0,
+    konut3p1: 0,
+    konut4p1: 0,
+    ortDaireM2: 0,
+    // Otel alanları
+    odaAdedi: 0,
+    standartOdaM2: 0,
+    suiteOdaAdedi: 0,
+    suiteOdaM2: 0,
+    otelKategori: "",
+    otelHedefM2: 0,
   });
 
   const update = <K extends keyof LandInput>(key: K, value: LandInput[K]) => {
@@ -34,6 +57,9 @@ const NewProject = () => {
     const project = createProject(form);
     navigate(`/proje/${project.id}?autostart=1`);
   };
+
+  const isKonut = form.zoningType === "Konut";
+  const isOtel = form.zoningType === "Turizm";
 
   return (
     <AppShell>
@@ -49,6 +75,7 @@ const NewProject = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* ── Proje Bilgileri ── */}
           <Section title="Proje Bilgileri">
             <Field label="Proje Adı" required>
               <input
@@ -69,16 +96,12 @@ const NewProject = () => {
             </div>
           </Section>
 
+          {/* ── Arsa Geometrisi (Yol Cephesi kaldırıldı) ── */}
           <Section title="Arsa Geometrisi">
             <div className="grid grid-cols-2 gap-4">
               <Field label="Parsel Alanı (m²)" required>
                 <input type="number" value={form.area} onChange={(e) => update("area", +e.target.value)} required min={1} className={inputCls} />
               </Field>
-              <Field label="Yol Cephesi (m)">
-                <input type="number" value={form.roadFront} onChange={(e) => update("roadFront", +e.target.value)} min={0} className={inputCls} />
-              </Field>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <Field label="Topografya">
                 <select value={form.topography} onChange={(e) => update("topography", e.target.value as LandInput["topography"])} className={inputCls}>
                   <option value="duz">Düz</option>
@@ -86,30 +109,39 @@ const NewProject = () => {
                   <option value="cok-egimli">Çok Eğimli</option>
                 </select>
               </Field>
-              <Field label="Köşe Parsel mi?">
-                <div className="flex items-center gap-3 h-10">
-                  <button
-                    type="button"
-                    onClick={() => update("cornerPlot", !form.cornerPlot)}
-                    className={`relative h-6 w-11 rounded-full transition-colors ${form.cornerPlot ? "bg-foreground" : "bg-muted border border-border"}`}
-                  >
-                    <span
-                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-background border border-border transition-transform ${
-                        form.cornerPlot ? "translate-x-5" : "translate-x-0.5"
-                      }`}
-                    />
-                  </button>
-                  <span className="text-sm text-muted-foreground">{form.cornerPlot ? "Evet" : "Hayır"}</span>
-                </div>
-              </Field>
             </div>
+            <Field label="Köşe Parsel mi?">
+              <div className="flex items-center gap-3 h-10">
+                <button
+                  type="button"
+                  onClick={() => update("cornerPlot", !form.cornerPlot)}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${form.cornerPlot ? "bg-foreground" : "bg-muted border border-border"}`}
+                >
+                  <span
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-background border border-border transition-transform ${
+                      form.cornerPlot ? "translate-x-5" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+                <span className="text-sm text-muted-foreground">{form.cornerPlot ? "Evet" : "Hayır"}</span>
+              </div>
+            </Field>
           </Section>
 
+          {/* ── İmar Koşulları ── */}
           <Section title="İmar Koşulları">
-            <Field label="Fonksiyon">
+            <Field label="Fonksiyon / Proje Tipi">
               <select value={form.zoningType} onChange={(e) => update("zoningType", e.target.value)} className={inputCls}>
                 {ZONING_OPTIONS.map((z) => <option key={z}>{z}</option>)}
               </select>
+            </Field>
+            <Field label="İmar Planı Niteliği">
+              <input
+                value={form.imarNiteligi}
+                onChange={(e) => update("imarNiteligi", e.target.value)}
+                placeholder="Örn: Ayrık Nizam Konut Alanı"
+                className={inputCls}
+              />
             </Field>
             <div className="grid grid-cols-3 gap-4">
               <Field label="Emsal (E)">
@@ -118,15 +150,118 @@ const NewProject = () => {
               <Field label="TAKS">
                 <input type="number" step="0.05" value={form.taks} onChange={(e) => update("taks", +e.target.value)} className={inputCls} />
               </Field>
-              <Field label="Maks. Yükseklik (m)">
-                <input type="number" value={form.maxHeight} onChange={(e) => update("maxHeight", +e.target.value)} className={inputCls} />
+              <Field label="Maks. Kat Adedi">
+                <input type="number" value={form.maxKat} onChange={(e) => update("maxKat", +e.target.value)} className={inputCls} />
               </Field>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Maks. Bina Yüksekliği (m)">
+                <input type="number" value={form.maxHeight} onChange={(e) => update("maxHeight", +e.target.value)} className={inputCls} />
+              </Field>
+              <Field label="İmar Planı Tarihi">
+                <input
+                  value={form.imarTarih}
+                  onChange={(e) => update("imarTarih", e.target.value)}
+                  placeholder="Örn: 2018 / Rev. 2023"
+                  className={inputCls}
+                />
+              </Field>
+            </div>
+
+            {/* Çekme Mesafeleri */}
+            <div>
+              <label className="text-xs text-muted-foreground font-medium block mb-1.5">Çekme Mesafeleri (m)</label>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Ön</span>
+                  <input type="number" value={form.cekmeOn} onChange={(e) => update("cekmeOn", +e.target.value)} className={inputCls} />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Yan</span>
+                  <input type="number" value={form.cekmeYan} onChange={(e) => update("cekmeYan", +e.target.value)} className={inputCls} />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Arka</span>
+                  <input type="number" value={form.cekmeArka} onChange={(e) => update("cekmeArka", +e.target.value)} className={inputCls} />
+                </div>
+              </div>
+            </div>
+
+            {/* Plan Notu */}
+            <Field label="Plan Notu / Özel Yapılaşma Koşulları">
+              <textarea
+                value={form.planNotu}
+                onChange={(e) => update("planNotu", e.target.value)}
+                rows={3}
+                placeholder="Varsa plan notu, silüet kararı, parsel birleşimi şartı, DOP oranı vb…"
+                className={`${inputCls} h-auto`}
+              />
+            </Field>
           </Section>
 
+          {/* ── Konut Parametreleri (sadece Konut seçiliyse) ── */}
+          {isKonut && (
+            <Section title="Konut Proje Parametreleri">
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Hedef Konut Adedi">
+                  <input type="number" value={form.konutAdedi} onChange={(e) => update("konutAdedi", +e.target.value)} className={inputCls} />
+                </Field>
+                <Field label="Ortalama Daire Büyüklüğü (m²)">
+                  <input type="number" value={form.ortDaireM2} onChange={(e) => update("ortDaireM2", +e.target.value)} className={inputCls} />
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="1+1 Adedi">
+                  <input type="number" value={form.konut1p1} onChange={(e) => update("konut1p1", +e.target.value)} className={inputCls} />
+                </Field>
+                <Field label="2+1 Adedi">
+                  <input type="number" value={form.konut2p1} onChange={(e) => update("konut2p1", +e.target.value)} className={inputCls} />
+                </Field>
+                <Field label="3+1 Adedi">
+                  <input type="number" value={form.konut3p1} onChange={(e) => update("konut3p1", +e.target.value)} className={inputCls} />
+                </Field>
+                <Field label="4+1 / Penthouse Adedi">
+                  <input type="number" value={form.konut4p1} onChange={(e) => update("konut4p1", +e.target.value)} className={inputCls} />
+                </Field>
+              </div>
+            </Section>
+          )}
+
+          {/* ── Otel Parametreleri (sadece Turizm seçiliyse) ── */}
+          {isOtel && (
+            <Section title="Otel Proje Parametreleri">
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Hedef Oda Adedi">
+                  <input type="number" value={form.odaAdedi} onChange={(e) => update("odaAdedi", +e.target.value)} className={inputCls} />
+                </Field>
+                <Field label="Standart Oda m²">
+                  <input type="number" value={form.standartOdaM2} onChange={(e) => update("standartOdaM2", +e.target.value)} className={inputCls} />
+                </Field>
+                <Field label="Suite Oda Adedi">
+                  <input type="number" value={form.suiteOdaAdedi} onChange={(e) => update("suiteOdaAdedi", +e.target.value)} className={inputCls} />
+                </Field>
+                <Field label="Suite Oda m²">
+                  <input type="number" value={form.suiteOdaM2} onChange={(e) => update("suiteOdaM2", +e.target.value)} className={inputCls} />
+                </Field>
+              </div>
+              <Field label="Otel Kategorisi">
+                <input
+                  value={form.otelKategori}
+                  onChange={(e) => update("otelKategori", e.target.value)}
+                  placeholder="Örn: 5★ / Butik / Aparthotel"
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="Toplam Hedef İnşaat Alanı (m²)">
+                <input type="number" value={form.otelHedefM2} onChange={(e) => update("otelHedefM2", +e.target.value)} className={inputCls} />
+              </Field>
+            </Section>
+          )}
+
+          {/* ── Notlar ── */}
           <Section title="Notlar (Opsiyonel)">
-            <Field label="Ek Bilgi">
-              <textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} rows={3} placeholder="Pazara dair gözlemler, özel durumlar…" className={inputCls} />
+            <Field label="Ek Bilgi / Genel Notlar">
+              <textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} rows={3} placeholder="Pazara dair gözlemler, özel durumlar…" className={`${inputCls} h-auto`} />
             </Field>
           </Section>
 
