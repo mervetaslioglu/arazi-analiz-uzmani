@@ -11,61 +11,178 @@ export interface UploadedDoc {
 }
 
 export interface LandInput {
-  // Genel Proje Bilgileri
+  // === TAB 1 — Genel Proje Bilgileri ===
   name: string;
+  projectCode?: string;
+  location?: string;
   city: string;
   district: string;
-  projectCode?: string;
-  developer?: string;
-  projectType: string; // Konut, Otel, Turizm Tesisi, Ticaret, Karma, Sanayi
-  area: number;
+  neighborhood?: string;
+  projectType: string;
+  feasibilityDate?: string;
+  preparingUnit?: string;
+  description?: string;
 
-  // İmar Durumu
-  zoningType: string;
-  emsal: number;
+  // === TAB 2 — İmar Durumu ===
+  zoningDocUploaded?: boolean;
+  zoningDocDate?: string;
+  planScale?: string;
+  planFunction?: string;
+  usageDecision?: string;
   taks: number;
-  maxHeight: number;
-  zoningPlanType?: string; // 1/1000 uygulama, 1/5000 nazım vb.
+  emsal: number; // KAKS
+  hmax?: number;
+  maxFloors?: number;
+  buildingHeight?: number;
+  frontSetback?: number;
+  sideSetback?: number;
+  rearSetback?: number;
+  emsaleDahil?: string;
+  emsalHarici?: string;
+  parkingRequirement?: string;
+  donatiKesinti?: string;
+  dopKopRatio?: number;
+  specialBuildingConditions?: string;
+  zoningDescription?: string;
+  zoningType: string; // backward-compat with engine
+  maxHeight: number; // backward-compat with engine
   zoningDocs?: UploadedDoc[];
 
-  // Plan Notları
-  planNotes?: string;
+  // === TAB 3 — Plan Notları ===
+  planNoteDocUploaded?: boolean;
+  planNoteDate?: string;
+  planNoteNumber?: string;
+  relatedPlanName?: string;
+  pnFunction?: string;
+  pnBuildingConditions?: string;
+  pnSetbacks?: string;
+  pnEmsalCalc?: string;
+  pnElevation?: string;
+  pnParking?: string;
+  pnLandscape?: string;
+  pnSpecialClauses?: string;
+  pnRiskNotes?: string;
+  pnDesignCritical?: string;
+  planNoteText?: string;
+  planNotes?: string; // backward-compat
   planNoteDocs?: UploadedDoc[];
 
-  // Parsel / Tapu Bilgileri
+  // === TAB 4 — Parsel / Tapu ===
   ada?: string;
   parsel?: string;
   pafta?: string;
-  tapuType?: string; // Müstakil, Hisseli, Kat Mülkiyeti
+  tapuArea?: number;
+  netParcelArea?: number;
+  shareStatus?: string;
+  ownershipStatus?: string;
+  encumbrances?: string;
+  existingStructure?: string;
+  currentUse?: string;
+  demolitionRequired?: string;
+  cadastralNote?: string;
+  parcelGeometry?: string;
+  parcelFronts?: string;
+  parcelDepth?: number;
+  parcelWidth?: number;
+  tapuType?: string;
   ownership?: string;
   tapuDocs?: UploadedDoc[];
 
-  // Topoğrafya ve Çevresel Veriler
+  // === TAB 5 — Topoğrafya ve Çevresel Veriler ===
+  area: number; // parsel alanı
   topography: TopographyType;
   cornerPlot: boolean;
-  elevationDiff?: number; // metre
+  slopePercent?: number;
+  elevationDiff?: number;
+  lowestElevation?: number;
+  highestElevation?: number;
+  dominantOrientation?: string;
+  viewPotential?: string;
+  sunExposure?: string;
+  windEffect?: string;
+  existingVegetation?: string;
+  neighborBuildings?: string;
+  surroundingDensity?: string;
+  accessStatus?: string;
+  vehicleAccess?: string;
+  pedestrianAccess?: string;
+  infrastructureConnection?: string;
+  technicalConstraints?: string;
+  topographyImpact?: string;
   soilType?: string;
   environmentNotes?: string;
 
-  // Program Bilgileri
+  // === TAB 6 — Program Bilgileri ===
+  targetGrossArea?: number;
+  targetNetArea?: number;
+  targetFloors?: number;
+  targetBlocks?: number;
+  basementFloors?: number;
+  parkingFloors?: number;
+  commonAreaApproach?: string;
+  socialAmenitiesDecision?: string;
+  technicalVolumeApproach?: string;
   // Konut
   konutAdedi?: number;
   ortKonutM2?: number;
+  minKonutM2?: number;
+  maxKonutM2?: number;
   unit1plus1?: number;
   unit2plus1?: number;
   unit3plus1?: number;
+  unit4plus1?: number;
+  duplexVilla?: number;
+  avgSellableArea?: number;
+  totalSellableResidential?: number;
+  commonAreaRatio?: number;
+  targetUserProfile?: string;
   // Otel / Turizm
   odaAdedi?: number;
   ortOdaM2?: number;
+  minOdaM2?: number;
+  maxOdaM2?: number;
   standartOda?: number;
   suite?: number;
   villaBungalov?: number;
+  totalRoomArea?: number;
   fbAlani?: number;
   lobiAlani?: number;
   spaAlani?: number;
   bohAlani?: number;
+  meetingArea?: number;
+  serviceAreas?: number;
+  grossPerRoom?: number;
+  hotelSegment?: string;
+  // Ofis
+  rentableOfficeArea?: number;
+  avgFloorArea?: number;
+  officeFloors?: number;
+  modularOfficeUnits?: number;
+  officeCommonRatio?: number;
+  employeeCapacity?: number;
+  officeMeetingAreas?: number;
+  officeLobbyArea?: number;
+  // Ticaret
+  rentableRetailArea?: number;
+  storeCount?: number;
+  avgStoreM2?: number;
+  minStoreM2?: number;
+  maxStoreM2?: number;
+  fbUnitCount?: number;
+  storageArea?: number;
+  circulationArea?: number;
+  loadingArea?: number;
+  // Karma
+  mixedResidentialArea?: number;
+  mixedHotelArea?: number;
+  mixedOfficeArea?: number;
+  mixedRetailArea?: number;
+  mixedSocialArea?: number;
+  programDistribution?: string;
+  primaryFunction?: string;
+  secondaryFunctions?: string;
 
-  // Kontrol ve Onay
+  // === TAB 7 — Kontrol ve Onay ===
   preparedBy?: string;
   approvedBy?: string;
   approvalDate?: string;
@@ -135,9 +252,11 @@ export const STAGE_DEFS: { id: StageId; title: string; subtitle: string; descrip
 export const PROJECT_TYPES = [
   "Konut",
   "Otel",
-  "Turizm Tesisi",
   "Ticaret",
-  "Ticaret + Konut",
+  "Ofis",
   "Karma Kullanım",
-  "Sanayi",
+  "Turizm Tesisi",
+  "Sağlık Tesisi",
+  "Eğitim Tesisi",
+  "Diğer",
 ];
