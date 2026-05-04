@@ -14,6 +14,7 @@ const NewProject = () => {
     city: "",
     district: "",
     area: 1000,
+    projectType: "Konut",
     zoningType: "Konut",
     emsal: 1.5,
     taks: 0.3,
