@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
-import { LandInput } from "@/lib/types";
+import { DocumentUploader } from "@/components/DocumentUploader";
+import { LandInput, UploadedDoc } from "@/lib/types";
 import { createProject } from "@/lib/storage";
 import { ArrowRight } from "lucide-react";
 
@@ -45,6 +46,8 @@ const NewProject = () => {
     suiteOdaM2: 0,
     otelKategori: "",
     otelHedefM2: 0,
+    zoningDocs: [],
+    planNoteDocs: [],
   });
 
   const update = <K extends keyof LandInput>(key: K, value: LandInput[K]) => {
@@ -195,6 +198,28 @@ const NewProject = () => {
                 rows={3}
                 placeholder="Varsa plan notu, silüet kararı, parsel birleşimi şartı, DOP oranı vb…"
                 className={`${inputCls} h-auto`}
+              />
+            </Field>
+
+            {/* İmar Durumu Belgeleri */}
+            <Field label="İmar Durumu Belgeleri">
+              <DocumentUploader
+                category="imar"
+                value={form.zoningDocs ?? []}
+                onChange={(docs: UploadedDoc[]) => update("zoningDocs", docs)}
+                label="İmar durumu belgesi yükle"
+                hint="İmar durum yazısı, çap, ölçü krokisi vb. (PDF/JPG/PNG/DWG)"
+              />
+            </Field>
+
+            {/* Plan Notları Belgeleri */}
+            <Field label="Plan Notları / Plan Paftaları">
+              <DocumentUploader
+                category="plan-notlari"
+                value={form.planNoteDocs ?? []}
+                onChange={(docs: UploadedDoc[]) => update("planNoteDocs", docs)}
+                label="Plan notu / pafta belgesi yükle"
+                hint="Plan notları, ilgili plan paftaları, revizyon yazıları (PDF/JPG/PNG)"
               />
             </Field>
           </Section>

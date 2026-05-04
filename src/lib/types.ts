@@ -8,6 +8,7 @@ export interface UploadedDoc {
   name: string;
   size: number;
   type: string;
+  path?: string;
 }
 
 export interface LandInput {
