@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
-import { LandInput } from "@/lib/types";
+import { DocumentUploader } from "@/components/DocumentUploader";
+import { LandInput, UploadedDoc } from "@/lib/types";
 import { createProject } from "@/lib/storage";
 import { ArrowRight } from "lucide-react";
 
