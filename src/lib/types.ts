@@ -2,18 +2,75 @@ export type StageId = "F1" | "F2" | "F3" | "F4" | "F5" | "F6";
 
 export type StageStatus = "pending" | "running" | "complete" | "error";
 
+export type TopographyType = "duz" | "egimli" | "cok-egimli";
+
+export interface UploadedDoc {
+  name: string;
+  size: number;
+  type: string;
+}
+
 export interface LandInput {
+  // Genel Proje Bilgileri
   name: string;
   city: string;
   district: string;
+  projectCode?: string;
+  developer?: string;
+  projectType: string; // Konut, Otel, Turizm Tesisi, Ticaret, Karma, Sanayi
   area: number;
+
+  // İmar Durumu
   zoningType: string;
   emsal: number;
   taks: number;
   maxHeight: number;
-  roadFront: number;
-  topography: "duz" | "egimli" | "cok-egimli";
+  zoningPlanType?: string; // 1/1000 uygulama, 1/5000 nazım vb.
+  zoningDocs?: UploadedDoc[];
+
+  // Plan Notları
+  planNotes?: string;
+  planNoteDocs?: UploadedDoc[];
+
+  // Parsel / Tapu Bilgileri
+  ada?: string;
+  parsel?: string;
+  pafta?: string;
+  tapuType?: string; // Müstakil, Hisseli, Kat Mülkiyeti
+  ownership?: string;
+  tapuDocs?: UploadedDoc[];
+
+  // Topoğrafya ve Çevresel Veriler
+  topography: TopographyType;
   cornerPlot: boolean;
+  elevationDiff?: number; // metre
+  soilType?: string;
+  environmentNotes?: string;
+
+  // Program Bilgileri
+  // Konut
+  konutAdedi?: number;
+  ortKonutM2?: number;
+  unit1plus1?: number;
+  unit2plus1?: number;
+  unit3plus1?: number;
+  // Otel / Turizm
+  odaAdedi?: number;
+  ortOdaM2?: number;
+  standartOda?: number;
+  suite?: number;
+  villaBungalov?: number;
+  fbAlani?: number;
+  lobiAlani?: number;
+  spaAlani?: number;
+  bohAlani?: number;
+
+  // Kontrol ve Onay
+  preparedBy?: string;
+  approvedBy?: string;
+  approvalDate?: string;
+  confirmed?: boolean;
+
   notes?: string;
 }
 
@@ -73,4 +130,14 @@ export const STAGE_DEFS: { id: StageId; title: string; subtitle: string; descrip
     subtitle: "Aşama 06",
     description: "Karar destek özeti, risk değerlendirmesi ve yönetici raporunun derlenmesi.",
   },
+];
+
+export const PROJECT_TYPES = [
+  "Konut",
+  "Otel",
+  "Turizm Tesisi",
+  "Ticaret",
+  "Ticaret + Konut",
+  "Karma Kullanım",
+  "Sanayi",
 ];
