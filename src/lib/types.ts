@@ -189,6 +189,26 @@ export interface LandInput {
   confirmed?: boolean;
 
   notes?: string;
+
+  // === Uploaded form ek alanları (geriye dönük) ===
+  roadFront?: number;
+  imarNiteligi?: string;
+  maxKat?: number;
+  imarTarih?: string;
+  cekmeOn?: number;
+  cekmeYan?: number;
+  cekmeArka?: number;
+  planNotu?: string;
+  ortDaireM2?: number;
+  konut1p1?: number;
+  konut2p1?: number;
+  konut3p1?: number;
+  konut4p1?: number;
+  standartOdaM2?: number;
+  suiteOdaAdedi?: number;
+  suiteOdaM2?: number;
+  otelKategori?: string;
+  otelHedefM2?: number;
 }
 
 export interface StageResult {
