@@ -43,9 +43,11 @@ function f1(i: LandInput) {
 }
 
 function f2(i: LandInput) {
-  const maxInsaat = i.area * i.emsal;
+  // F2: İmar hakkı gösterimi — sadece emsal alanı kullanılır
+  const emsalAlani = i.area * i.emsal;
   const tabanAlan = i.area * i.taks;
   const maxKat = Math.floor(i.maxHeight / 3.2);
+
   const data = {
     imarKosullari: {
       "Fonksiyon": i.zoningType,
@@ -55,7 +57,7 @@ function f2(i: LandInput) {
       "Tahmini Maks. Kat": `${maxKat} kat`,
     },
     hesaplananHaklar: {
-      "Maks. Toplam İnşaat Alanı": `${fmt(maxInsaat)} m²`,
+      "Emsal Alanı (Parsel × E)": `${fmt(emsalAlani)} m²`,
       "Maks. Taban Oturum Alanı": `${fmt(tabanAlan)} m²`,
       "Bahçe / Açık Alan": `${fmt(i.area - tabanAlan)} m² (%${fmt((1 - i.taks) * 100, 0)})`,
     },
@@ -67,7 +69,7 @@ function f2(i: LandInput) {
   };
   return {
     data,
-    summary: `Maks. ${fmt(maxInsaat)} m² inşaat hakkı, ${maxKat} kat yapım potansiyeli tespit edildi.`,
+    summary: `Emsal alanı ${fmt(emsalAlani)} m², taban alanı ${fmt(tabanAlan)} m², ${maxKat} kat yapım potansiyeli tespit edildi.`,
   };
 }
 
@@ -93,13 +95,16 @@ function f3(i: LandInput) {
 }
 
 function f4(i: LandInput) {
-  const maxInsaat = i.area * i.emsal;
   const tabanAlan = i.area * i.taks;
   const maxKat = Math.floor(i.maxHeight / 3.2);
   const isResidential = /konut/i.test(i.zoningType);
   const unitSize = isResidential ? 95 : 70;
-  const efficiency = 0.78;
-  const satilabilir = maxInsaat * efficiency;
+
+  // Alan hiyerarşisi
+  const emsalAlani   = i.area * i.emsal;                  // Parsel × E
+  const insaatAlani  = emsalAlani * 1.3 * 1.1;            // Emsal × 1.3 (ortak/teknik) × 1.1 (bodrum/sığınak)
+  const satilabilir  = emsalAlani * 1.3;                  // Emsal × 1.3 (ortak alanlar dahil, bodrum hariç)
+
   const unite = Math.floor(satilabilir / unitSize);
 
   const data = {
@@ -110,12 +115,13 @@ function f4(i: LandInput) {
       "Otopark": "Bodrum kat (2 seviye önerilir)",
     },
     program: {
-      "Toplam İnşaat Alanı": `${fmt(maxInsaat)} m²`,
-      "Satılabilir / Kiralanabilir Alan": `${fmt(satilabilir)} m² (verim %${fmt(efficiency * 100)})`,
-      "Ortalama Birim Büyüklüğü": `${unitSize} m²`,
-      "Tahmini Birim Sayısı": `${unite} adet`,
-      "Kat Sayısı": `${maxKat} normal kat + 2 bodrum`,
-      "Taban Alanı": `${fmt(tabanAlan)} m²`,
+      "Emsal Alanı (Parsel × E)":            `${fmt(emsalAlani)} m²`,
+      "Toplam İnşaat Alanı (Emsal × 1.3 × 1.1)": `${fmt(insaatAlani)} m²`,
+      "Satılabilir Alan (Emsal × 1.3)":      `${fmt(satilabilir)} m²`,
+      "Ortalama Birim Büyüklüğü":            `${unitSize} m²`,
+      "Tahmini Birim Sayısı":                `${unite} adet`,
+      "Kat Sayısı":                          `${maxKat} normal kat + 2 bodrum`,
+      "Taban Alanı":                         `${fmt(tabanAlan)} m²`,
     },
     stratejiNotlari: [
       "Zemin kat: lobi, sosyal alanlar (konut) / ticari (karma)",
@@ -125,50 +131,55 @@ function f4(i: LandInput) {
   };
   return {
     data,
-    summary: `${unite} birim, ${maxKat} kat, ${fmt(satilabilir)} m² satılabilir alan stratejisi.`,
+    summary: `${unite} birim, ${maxKat} kat — emsal: ${fmt(emsalAlani)} m² / inşaat: ${fmt(insaatAlani)} m² / satılabilir: ${fmt(satilabilir)} m².`,
   };
 }
 
 function f5(i: LandInput) {
-  const maxInsaat = i.area * i.emsal;
-  const efficiency = 0.78;
-  const satilabilir = maxInsaat * efficiency;
   const isResidential = /konut/i.test(i.zoningType);
+  const istanbul = i.city.toLowerCase().includes("istanbul");
 
-  // TRY assumptions — illustrative
-  const arsaBedeli = i.area * (i.city.toLowerCase().includes("istanbul") ? 85000 : 35000);
-  const insaatMaliyetiM2 = isResidential ? 22000 : 26000;
-  const toplamInsaatMaliyeti = maxInsaat * insaatMaliyetiM2;
-  const yumusakMaliyet = toplamInsaatMaliyeti * 0.12;
-  const toplamMaliyet = arsaBedeli + toplamInsaatMaliyeti + yumusakMaliyet;
+  // Alan hiyerarşisi
+  const emsalAlani   = i.area * i.emsal;                  // Parsel × E
+  const insaatAlani  = emsalAlani * 1.3 * 1.1;            // Toplam inşaat (bodrum dahil)
+  const satilabilir  = emsalAlani * 1.3;                  // Satılabilir / kiralanabilir
 
-  const satisFiyatiM2 = isResidential
-    ? i.city.toLowerCase().includes("istanbul")
-      ? 95000
-      : 55000
-    : 70000;
+  // Maliyet — kullanıcı girdisi öncelikli, yoksa tahmini
+  const arsaBedeli          = i.arsaBedeli          ?? i.area * (istanbul ? 85_000 : 35_000);
+  const insaatMaliyetiM2    = i.insaatMaliyetiM2    ?? (isResidential ? 22_000 : 26_000);
+  const satisFiyatiM2       = i.satisFiyatiM2       ?? (isResidential ? (istanbul ? 95_000 : 55_000) : 70_000);
+
+  const toplamInsaatMaliyeti = insaatAlani * insaatMaliyetiM2;
+  const yumusakMaliyet       = toplamInsaatMaliyeti * 0.12;
+  const toplamMaliyet        = arsaBedeli + toplamInsaatMaliyeti + yumusakMaliyet;
+
   const toplamGelir = satilabilir * satisFiyatiM2;
-  const brutKar = toplamGelir - toplamMaliyet;
-  const karMarji = (brutKar / toplamGelir) * 100;
-  const roi = (brutKar / toplamMaliyet) * 100;
+  const brutKar     = toplamGelir - toplamMaliyet;
+  const karMarji    = (brutKar / toplamGelir) * 100;
+  const roi         = (brutKar / toplamMaliyet) * 100;
 
   const data = {
+    alanlar: {
+      "Emsal Alanı (Parsel × E)":                `${fmt(emsalAlani)} m²`,
+      "Toplam İnşaat Alanı (Emsal × 1.3 × 1.1)": `${fmt(insaatAlani)} m²`,
+      "Satılabilir Alan (Emsal × 1.3)":           `${fmt(satilabilir)} m²`,
+    },
     maliyetler: {
-      "Arsa Bedeli (tahmini)": `₺ ${fmt(arsaBedeli)}`,
-      "İnşaat Maliyeti": `₺ ${fmt(toplamInsaatMaliyeti)} (${fmt(insaatMaliyetiM2)} ₺/m²)`,
-      "Yumuşak Maliyetler (%12)": `₺ ${fmt(yumusakMaliyet)}`,
-      "TOPLAM YATIRIM": `₺ ${fmt(toplamMaliyet)}`,
+      "Arsa Bedeli":                `₺ ${fmt(arsaBedeli)}`,
+      "İnşaat Maliyeti":            `₺ ${fmt(toplamInsaatMaliyeti)} (${fmt(insaatMaliyetiM2)} ₺/m²)`,
+      "Yumuşak Maliyetler (%12)":   `₺ ${fmt(yumusakMaliyet)}`,
+      "TOPLAM YATIRIM":             `₺ ${fmt(toplamMaliyet)}`,
     },
     gelir: {
-      "Satılabilir Alan": `${fmt(satilabilir)} m²`,
-      "Ortalama Satış Fiyatı": `₺ ${fmt(satisFiyatiM2)} / m²`,
-      "TOPLAM GELİR (tahmini)": `₺ ${fmt(toplamGelir)}`,
+      "Satılabilir Alan":           `${fmt(satilabilir)} m²`,
+      "Ortalama Satış Fiyatı":      `₺ ${fmt(satisFiyatiM2)} / m²`,
+      "TOPLAM GELİR (tahmini)":     `₺ ${fmt(toplamGelir)}`,
     },
     karlilik: {
-      "Brüt Kar": `₺ ${fmt(brutKar)}`,
-      "Kar Marjı": `% ${fmt(karMarji, 1)}`,
-      "ROI (Yatırım Getirisi)": `% ${fmt(roi, 1)}`,
-      "Geri Dönüş Süresi (tahmini)": `${fmt(36 + (30 - karMarji) * 0.5, 0)} ay`,
+      "Brüt Kar":                   `₺ ${fmt(brutKar)}`,
+      "Kar Marjı":                  `% ${fmt(karMarji, 1)}`,
+      "ROI (Yatırım Getirisi)":     `% ${fmt(roi, 1)}`,
+      "Geri Dönüş Süresi (tahmini)":`${fmt(36 + (30 - karMarji) * 0.5, 0)} ay`,
     },
     _raw: { toplamMaliyet, toplamGelir, brutKar, karMarji, roi },
   };
@@ -180,7 +191,8 @@ function f5(i: LandInput) {
 }
 
 function f6(i: LandInput) {
-  const maxInsaat = i.area * i.emsal;
+  const emsalAlani  = i.area * i.emsal;
+  const insaatAlani = emsalAlani * 1.3 * 1.1;
   const f5Data = f5(i).data._raw as any;
   const verdict =
     f5Data.karMarji > 25 ? "ÖNERİLİR" : f5Data.karMarji > 15 ? "DİKKATLİ İLERLE" : "RİSKLİ";
@@ -195,7 +207,7 @@ function f6(i: LandInput) {
     },
     ozet: [
       `${i.name} parseli, ${i.city}/${i.district} lokasyonunda ${fmt(i.area)} m² büyüklüğündedir.`,
-      `${i.zoningType} fonksiyonu altında ${i.emsal} emsal ile ${fmt(maxInsaat)} m² inşaat hakkı bulunmaktadır.`,
+      `${i.zoningType} fonksiyonu altında ${i.emsal} emsal ile ${fmt(emsalAlani)} m² emsal alanı, ${fmt(insaatAlani)} m² toplam inşaat alanı elde edilmektedir.`,
       `Önerilen tasarım stratejisi ve maliyet/gelir analizi doğrultusunda proje %${fmt(f5Data.karMarji, 1)} kar marjı ve %${fmt(f5Data.roi, 1)} ROI sunmaktadır.`,
       verdict === "ÖNERİLİR"
         ? "Sonuç: Yatırım için olumlu sinyaller mevcut, geliştirme süreci başlatılabilir."

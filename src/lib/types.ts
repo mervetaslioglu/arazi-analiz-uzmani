@@ -210,6 +210,15 @@ export interface LandInput {
   suiteOdaM2?: number;
   otelKategori?: string;
   otelHedefM2?: number;
+
+  // Fizibilite (F5) — opsiyonel girdiler
+  arsaBedeli?: number;
+  insaatMaliyetiM2?: number;
+  satisFiyatiM2?: number;
+
+  // Yerel (Supabase'siz) belge isim listeleri
+  imarBelgeleri?: string[];
+  planBelgeleri?: string[];
 }
 
 export interface StageResult {

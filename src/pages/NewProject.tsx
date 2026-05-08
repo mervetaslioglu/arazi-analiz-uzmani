@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
-import { DocumentUploader } from "@/components/DocumentUploader";
-import { LandInput, UploadedDoc } from "@/lib/types";
+import { LandInput } from "@/lib/types";
 import { createProject } from "@/lib/storage";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Upload, FileText, Trash2 } from "lucide-react";
 
 const ZONING_OPTIONS = ["Konut", "Ticaret", "Ticaret + Konut", "Turizm", "Sanayi", "Karma Kullanım"];
 
@@ -46,8 +45,8 @@ const NewProject = () => {
     suiteOdaM2: 0,
     otelKategori: "",
     otelHedefM2: 0,
-    zoningDocs: [],
-    planNoteDocs: [],
+    imarBelgeleri: [],
+    planBelgeleri: [],
   });
 
   const update = <K extends keyof LandInput>(key: K, value: LandInput[K]) => {
@@ -203,23 +202,21 @@ const NewProject = () => {
 
             {/* İmar Durumu Belgeleri */}
             <Field label="İmar Durumu Belgeleri">
-              <DocumentUploader
-                category="imar"
-                value={form.zoningDocs ?? []}
-                onChange={(docs: UploadedDoc[]) => update("zoningDocs", docs)}
-                label="İmar durumu belgesi yükle"
-                hint="İmar durum yazısı, çap, ölçü krokisi vb. (PDF/JPG/PNG/DWG)"
+              <LocalFilePicker
+                value={form.imarBelgeleri ?? []}
+                onChange={(names) => update("imarBelgeleri", names)}
+                label="İmar durumu belgesi seç"
+                hint="İmar durum yazısı, çap, ölçü krokisi vb. (yalnızca isim kaydedilir)"
               />
             </Field>
 
             {/* Plan Notları Belgeleri */}
             <Field label="Plan Notları / Plan Paftaları">
-              <DocumentUploader
-                category="plan-notlari"
-                value={form.planNoteDocs ?? []}
-                onChange={(docs: UploadedDoc[]) => update("planNoteDocs", docs)}
-                label="Plan notu / pafta belgesi yükle"
-                hint="Plan notları, ilgili plan paftaları, revizyon yazıları (PDF/JPG/PNG)"
+              <LocalFilePicker
+                value={form.planBelgeleri ?? []}
+                onChange={(names) => update("planBelgeleri", names)}
+                label="Plan notu / pafta belgesi seç"
+                hint="Plan notları, ilgili plan paftaları (yalnızca isim kaydedilir)"
               />
             </Field>
           </Section>
@@ -322,5 +319,100 @@ const Field = ({ label, required, children }: { label: string; required?: boolea
     {children}
   </div>
 );
+
+interface LocalFilePickerProps {
+  value: string[];
+  onChange: (names: string[]) => void;
+  label?: string;
+  hint?: string;
+  accept?: string;
+}
+
+const LocalFilePicker = ({
+  value,
+  onChange,
+  label = "Dosya seç",
+  hint = "Dosyalar yalnızca proje verisinde isim olarak saklanır.",
+  accept = ".pdf,.png,.jpg,.jpeg,.dwg,.doc,.docx",
+}: LocalFilePickerProps) => {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [sizes, setSizes] = useState<Record<string, number>>({});
+
+  const handleFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const incoming = Array.from(files);
+    const nextSizes = { ...sizes };
+    const nextNames = [...value];
+    for (const f of incoming) {
+      if (!nextNames.includes(f.name)) nextNames.push(f.name);
+      nextSizes[f.name] = f.size;
+    }
+    setSizes(nextSizes);
+    onChange(nextNames);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const handleRemove = (name: string) => {
+    onChange(value.filter((n) => n !== name));
+    const { [name]: _, ...rest } = sizes;
+    setSizes(rest);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div
+        className="rounded-md border border-dashed border-border bg-secondary/30 p-4 text-center cursor-pointer hover:bg-secondary/50 transition-colors"
+        onClick={() => fileRef.current?.click()}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          handleFiles(e.dataTransfer.files);
+        }}
+      >
+        <input
+          ref={fileRef}
+          type="file"
+          multiple
+          accept={accept}
+          className="hidden"
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+        <div className="flex flex-col items-center gap-1.5 text-muted-foreground">
+          <Upload className="h-5 w-5" />
+          <div className="text-sm font-medium text-foreground">{label}</div>
+          <div className="text-[11px]">{hint}</div>
+        </div>
+      </div>
+
+      {value.length > 0 && (
+        <ul className="divide-y divide-border rounded-md border border-border bg-card">
+          {value.map((name) => (
+            <li key={name} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+              <div className="flex items-center gap-2 min-w-0">
+                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <div className="truncate font-medium">{name}</div>
+                  {sizes[name] !== undefined && (
+                    <div className="text-[11px] text-muted-foreground font-mono">
+                      {(sizes[name] / 1024).toFixed(1)} KB
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemove(name)}
+                className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+                title="Kaldır"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 export default NewProject;
