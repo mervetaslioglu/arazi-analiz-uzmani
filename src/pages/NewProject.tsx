@@ -202,23 +202,21 @@ const NewProject = () => {
 
             {/* İmar Durumu Belgeleri */}
             <Field label="İmar Durumu Belgeleri">
-              <DocumentUploader
-                category="imar"
-                value={form.zoningDocs ?? []}
-                onChange={(docs: UploadedDoc[]) => update("zoningDocs", docs)}
-                label="İmar durumu belgesi yükle"
-                hint="İmar durum yazısı, çap, ölçü krokisi vb. (PDF/JPG/PNG/DWG)"
+              <LocalFilePicker
+                value={form.imarBelgeleri ?? []}
+                onChange={(names) => update("imarBelgeleri", names)}
+                label="İmar durumu belgesi seç"
+                hint="İmar durum yazısı, çap, ölçü krokisi vb. (yalnızca isim kaydedilir)"
               />
             </Field>
 
             {/* Plan Notları Belgeleri */}
             <Field label="Plan Notları / Plan Paftaları">
-              <DocumentUploader
-                category="plan-notlari"
-                value={form.planNoteDocs ?? []}
-                onChange={(docs: UploadedDoc[]) => update("planNoteDocs", docs)}
-                label="Plan notu / pafta belgesi yükle"
-                hint="Plan notları, ilgili plan paftaları, revizyon yazıları (PDF/JPG/PNG)"
+              <LocalFilePicker
+                value={form.planBelgeleri ?? []}
+                onChange={(names) => update("planBelgeleri", names)}
+                label="Plan notu / pafta belgesi seç"
+                hint="Plan notları, ilgili plan paftaları (yalnızca isim kaydedilir)"
               />
             </Field>
           </Section>
