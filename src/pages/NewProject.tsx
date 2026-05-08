@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
-import { DocumentUploader } from "@/components/DocumentUploader";
-import { LandInput, UploadedDoc } from "@/lib/types";
+import { LandInput } from "@/lib/types";
 import { createProject } from "@/lib/storage";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Upload, FileText, Trash2 } from "lucide-react";
 
 const ZONING_OPTIONS = ["Konut", "Ticaret", "Ticaret + Konut", "Turizm", "Sanayi", "Karma Kullanım"];
 
