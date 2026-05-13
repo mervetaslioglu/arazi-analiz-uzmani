@@ -82,4 +82,6 @@ export const IL_ILCE: Record<string, string[]> = {
   "Zonguldak": ["Alaplı","Çaycuma","Devrek","Ereğli","Gökçebey","Kilimli","Kozlu","Zonguldak Merkez"],
 };
 
-export const IL_LISTESI = Object.keys(IL_ILCE).sort();
+export const IL_LISTESI = Object.keys(IL_ILCE).sort((a, b) =>
+  a.localeCompare(b, "tr", { sensitivity: "base" })
+);
