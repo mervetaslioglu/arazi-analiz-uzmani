@@ -19,7 +19,7 @@ export interface LandInput {
   city: string;
   district: string;
   neighborhood?: string;
-  projectType: string;
+  projectType?: string;
   feasibilityDate?: string;
   preparingUnit?: string;
   description?: string;
