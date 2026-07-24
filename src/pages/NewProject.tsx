@@ -1,4 +1,4 @@
-mport { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { LandInput } from "@/lib/types";
