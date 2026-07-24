@@ -51,7 +51,7 @@ export const Sidebar = () => {
         ))}
       </nav>
       <div className="px-6 py-5 border-t border-border flex justify-center">
-        <img src={bilgiliLogo} alt="Bilgili" className="h-7 w-auto opacity-85" />
+        <img src={bilgiliLogo} alt="Bilgili" className="h-8 w-auto opacity-85" />
       </div>
     </aside>
   );
