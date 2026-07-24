@@ -1,12 +1,10 @@
-import { useRef, useState } from "react";
+mport { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { LandInput } from "@/lib/types";
 import { createProject } from "@/lib/storage";
 import { ArrowRight, Trash2, Upload } from "lucide-react";
 import { IL_ILCE, IL_LISTESI } from "@/lib/turkiyeIlIlce";
-
-const ZONING_OPTIONS = ["Konut", "Ticaret", "Ticaret + Konut", "Turizm", "Sanayi", "Karma Kullanım"];
 
 const NewProject = () => {
   const navigate = useNavigate();
@@ -16,7 +14,7 @@ const NewProject = () => {
     city: "",
     district: "",
     area: 1000,
-    zoningType: "Konut",
+    zoningType: "Konut (Ayrık Nizam)",
     emsal: 1.5,
     taks: 0.3,
     maxHeight: 21,
@@ -24,7 +22,6 @@ const NewProject = () => {
     topography: "duz",
     cornerPlot: false,
     notes: "",
-    // İmar Durumu ek alanlar
     imarNiteligi: "",
     maxKat: 8,
     imarTarih: "",
@@ -33,14 +30,12 @@ const NewProject = () => {
     cekmeArka: 3,
     planNotu: "",
     imarBelgeleri: [],
-    // Konut alanları
     konutAdedi: 0,
     konut1p1: 0,
     konut2p1: 0,
     konut3p1: 0,
     konut4p1: 0,
     ortDaireM2: 0,
-    // Otel alanları
     odaAdedi: 0,
     standartOdaM2: 0,
     suiteOdaAdedi: 0,
@@ -60,8 +55,16 @@ const NewProject = () => {
     navigate(`/proje/${project.id}?autostart=1`);
   };
 
-  const isKonut = form.zoningType === "Konut";
-  const isOtel = form.zoningType === "Turizm";
+  const isKonut =
+    form.zoningType.startsWith("Konut") ||
+    form.zoningType === "Villa / Müstakil Konut" ||
+    form.zoningType === "Rezidans" ||
+    form.zoningType === "Toplu Konut (TOKİ Tipi)";
+  const isOtel =
+    form.zoningType.startsWith("Otel") ||
+    form.zoningType === "Butik Otel" ||
+    form.zoningType === "Tatil Köyü / Resort" ||
+    form.zoningType === "Apart / Devremülk";
   const ilceler = form.city ? (IL_ILCE[form.city] ?? []) : [];
 
   const handleCityChange = (city: string) => {
@@ -94,7 +97,6 @@ const NewProject = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ── Proje Bilgileri ── */}
           <Section title="Proje Bilgileri">
             <Field label="Proje Adı" required>
               <input
@@ -136,7 +138,6 @@ const NewProject = () => {
             </div>
           </Section>
 
-          {/* ── Arsa Geometrisi (Yol Cephesi kaldırıldı) ── */}
           <Section title="Arsa Geometrisi">
             <div className="grid grid-cols-2 gap-4">
               <Field label="Parsel Alanı (m²)" required>
@@ -168,11 +169,44 @@ const NewProject = () => {
             </Field>
           </Section>
 
-          {/* ── İmar Koşulları ── */}
           <Section title="İmar Koşulları">
             <Field label="Fonksiyon / Proje Tipi">
               <select value={form.zoningType} onChange={(e) => update("zoningType", e.target.value)} className={inputCls}>
-                {ZONING_OPTIONS.map((z) => <option key={z}>{z}</option>)}
+                <optgroup label="Konut">
+                  <option>Konut (Ayrık Nizam)</option>
+                  <option>Konut (Bitişik Nizam)</option>
+                  <option>Konut (Blok Nizam)</option>
+                  <option>Villa / Müstakil Konut</option>
+                  <option>Rezidans</option>
+                  <option>Toplu Konut (TOKİ Tipi)</option>
+                </optgroup>
+                <optgroup label="Ticaret & Ofis">
+                  <option>Ticaret</option>
+                  <option>Ofis / İş Merkezi</option>
+                  <option>Alışveriş Merkezi (AVM)</option>
+                  <option>Cadde Mağazacılığı (High Street)</option>
+                  <option>Ticaret + Konut (Mixed)</option>
+                </optgroup>
+                <optgroup label="Turizm & Konaklama">
+                  <option>Otel / Turizm Tesisi</option>
+                  <option>Butik Otel</option>
+                  <option>Tatil Köyü / Resort</option>
+                  <option>Apart / Devremülk</option>
+                </optgroup>
+                <optgroup label="Sanayi & Lojistik">
+                  <option>Sanayi</option>
+                  <option>Lojistik / Depo</option>
+                  <option>Organize Sanayi (OSB)</option>
+                  <option>Soğuk Hava Deposu</option>
+                </optgroup>
+                <optgroup label="Sosyal & Diğer">
+                  <option>Sağlık Tesisi (Hastane / Klinik)</option>
+                  <option>Eğitim Tesisi (Okul / Kampüs)</option>
+                  <option>Karma Kullanım (Mixed-Use)</option>
+                  <option>Akaryakıt İstasyonu</option>
+                  <option>Tarımsal / Bağ-Bahçe</option>
+                  <option>Özel Proje Alanı</option>
+                </optgroup>
               </select>
             </Field>
             <Field label="İmar Planı Niteliği">
@@ -208,7 +242,6 @@ const NewProject = () => {
               </Field>
             </div>
 
-            {/* Çekme Mesafeleri */}
             <div>
               <label className="text-xs text-muted-foreground font-medium block mb-1.5">Çekme Mesafeleri (m)</label>
               <div className="grid grid-cols-3 gap-3">
@@ -227,7 +260,6 @@ const NewProject = () => {
               </div>
             </div>
 
-            {/* Plan Notu */}
             <Field label="Plan Notu / Özel Yapılaşma Koşulları">
               <textarea
                 value={form.planNotu}
@@ -238,7 +270,6 @@ const NewProject = () => {
               />
             </Field>
 
-            {/* İmar Belgeleri */}
             <div className="space-y-3">
               <label className="text-xs text-muted-foreground font-medium">İmar Belgesi Ekle</label>
               <div
@@ -280,7 +311,6 @@ const NewProject = () => {
             </div>
           </Section>
 
-          {/* ── Konut Parametreleri (sadece Konut seçiliyse) ── */}
           {isKonut && (
             <Section title="Konut Proje Parametreleri">
               <div className="grid grid-cols-2 gap-4">
@@ -308,7 +338,6 @@ const NewProject = () => {
             </Section>
           )}
 
-          {/* ── Otel Parametreleri (sadece Turizm seçiliyse) ── */}
           {isOtel && (
             <Section title="Otel Proje Parametreleri">
               <div className="grid grid-cols-2 gap-4">
@@ -339,7 +368,6 @@ const NewProject = () => {
             </Section>
           )}
 
-          {/* ── Notlar ── */}
           <Section title="Notlar (Opsiyonel)">
             <Field label="Ek Bilgi / Genel Notlar">
               <textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} rows={3} placeholder="Pazara dair gözlemler, özel durumlar…" className={`${inputCls} h-auto`} />
