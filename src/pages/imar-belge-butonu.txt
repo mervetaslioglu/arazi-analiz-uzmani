@@ -1,0 +1,62 @@
+// ============================================================
+// İMAR DURUMU — DOSYA EKLEME BUTONU
+// Hedef dosya: src/pages/NewProject.tsx
+// ============================================================
+
+// 1) Dosyanın en üstündeki lucide-react import satırını şu şekilde güncelle:
+import { ArrowRight, Upload, FileText, Trash2 } from "lucide-react";
+
+// 2) "İmar Koşulları" <Section> bloğunun İÇİNDE, en sona (Plan Notu /
+//    Maks. Kat satırından sonra, </Section>'dan hemen önce) şunu ekle:
+
+<Field label="İmar Durumu Belgesi">
+  <label
+    htmlFor="imar-file"
+    className="flex flex-col items-center gap-1.5 rounded-md border border-dashed border-border bg-secondary/30 p-4 text-center cursor-pointer hover:bg-secondary/50 transition-colors"
+  >
+    <Upload className="h-5 w-5 text-muted-foreground" />
+    <span className="text-sm font-medium text-foreground">İmar Belgesi Ekle</span>
+    <span className="text-[11px] text-muted-foreground">
+      İmar durumu, plan örneği veya çizim dosyalarını ekleyin (PDF, görüntü, DWG)
+    </span>
+    <input
+      id="imar-file"
+      type="file"
+      multiple
+      accept=".pdf,.png,.jpg,.jpeg,.dwg,.doc,.docx"
+      className="hidden"
+      onChange={(e) => {
+        const names = Array.from(e.target.files ?? []).map((f) => f.name);
+        update("imarBelgeleri", [...(form.imarBelgeleri ?? []), ...names]);
+      }}
+    />
+  </label>
+
+  {(form.imarBelgeleri?.length ?? 0) > 0 && (
+    <ul className="mt-2 divide-y divide-border rounded-md border border-border bg-card">
+      {form.imarBelgeleri!.map((name, i) => (
+        <li key={i} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+          <span className="flex items-center gap-2 min-w-0">
+            <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="truncate">{name}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() =>
+              update("imarBelgeleri", form.imarBelgeleri!.filter((_, x) => x !== i))
+            }
+            className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  )}
+</Field>
+
+// Not: form.imarBelgeleri alanı LandInput tipinde zaten var (string[]).
+// Bu versiyon Supabase gerektirmez — sadece dosya adlarını tutar.
+// Gerçek yükleme (depolama) için repodaki hazır DocumentUploader bileşenini
+// kullanabilirsin: <DocumentUploader category="imar" value={form.zoningDocs}
+//   onChange={(d) => update("zoningDocs", d)} />
