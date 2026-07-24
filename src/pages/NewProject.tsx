@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { LandInput } from "@/lib/types";
 import { createProject } from "@/lib/storage";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Trash2, Upload } from "lucide-react";
 import { IL_ILCE, IL_LISTESI } from "@/lib/turkiyeIlIlce";
 
 const ZONING_OPTIONS = ["Konut", "Ticaret", "Ticaret + Konut", "Turizm", "Sanayi", "Karma Kullanım"];
 
 const NewProject = () => {
   const navigate = useNavigate();
+  const imarFileRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<LandInput>({
     name: "",
     city: "",
@@ -31,6 +32,7 @@ const NewProject = () => {
     cekmeYan: 3,
     cekmeArka: 3,
     planNotu: "",
+    imarBelgeleri: [],
     // Konut alanları
     konutAdedi: 0,
     konut1p1: 0,
