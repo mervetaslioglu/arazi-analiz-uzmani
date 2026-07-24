@@ -237,6 +237,47 @@ const NewProject = () => {
                 className={`${inputCls} h-auto`}
               />
             </Field>
+
+            {/* İmar Belgeleri */}
+            <div className="space-y-3">
+              <label className="text-xs text-muted-foreground font-medium">İmar Belgesi Ekle</label>
+              <div
+                className="rounded-md border border-dashed border-border bg-secondary/30 p-4 text-center cursor-pointer hover:bg-secondary/50 transition-colors"
+                onClick={() => imarFileRef.current?.click()}
+              >
+                <input
+                  ref={imarFileRef}
+                  type="file"
+                  multiple
+                  accept=".pdf,.png,.jpg,.jpeg,.dwg"
+                  className="hidden"
+                  onChange={handleImarFiles}
+                />
+                <div className="flex flex-col items-center gap-1.5 text-muted-foreground">
+                  <Upload className="h-5 w-5" />
+                  <div className="text-sm font-medium text-foreground">Dosya Yükle</div>
+                  <div className="text-[11px]">PDF, görüntü veya DWG dosyalarını seçin</div>
+                </div>
+              </div>
+
+              {(form.imarBelgeleri ?? []).length > 0 && (
+                <ul className="divide-y divide-border rounded-md border border-border bg-card">
+                  {(form.imarBelgeleri ?? []).map((name, i) => (
+                    <li key={`${name}-${i}`} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                      <span className="truncate font-medium">{name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeImarBelge(name)}
+                        className="p-1.5 rounded hover:bg-destructive/10 text-destructive shrink-0"
+                        title="Kaldır"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </Section>
 
           {/* ── Konut Parametreleri (sadece Konut seçiliyse) ── */}
