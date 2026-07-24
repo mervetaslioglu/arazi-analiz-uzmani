@@ -68,6 +68,18 @@ const NewProject = () => {
     setForm((f) => ({ ...f, city, district: "" }));
   };
 
+  const handleImarFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const names = Array.from(files).map((f) => f.name);
+    update("imarBelgeleri", [...(form.imarBelgeleri ?? []), ...names]);
+    e.target.value = "";
+  };
+
+  const removeImarBelge = (name: string) => {
+    update("imarBelgeleri", (form.imarBelgeleri ?? []).filter((n) => n !== name));
+  };
+
   return (
     <AppShell>
       <div className="max-w-3xl mx-auto px-6 lg:px-10 py-10">
