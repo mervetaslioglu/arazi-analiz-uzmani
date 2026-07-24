@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { LandInput } from "@/lib/types";
 import { createProject } from "@/lib/storage";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Trash2, Upload } from "lucide-react";
 import { IL_ILCE, IL_LISTESI } from "@/lib/turkiyeIlIlce";
 
 const ZONING_OPTIONS = ["Konut", "Ticaret", "Ticaret + Konut", "Turizm", "Sanayi", "Karma Kullanım"];
 
 const NewProject = () => {
   const navigate = useNavigate();
+  const imarFileRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<LandInput>({
     name: "",
     city: "",
@@ -31,6 +32,7 @@ const NewProject = () => {
     cekmeYan: 3,
     cekmeArka: 3,
     planNotu: "",
+    imarBelgeleri: [],
     // Konut alanları
     konutAdedi: 0,
     konut1p1: 0,
@@ -64,6 +66,18 @@ const NewProject = () => {
 
   const handleCityChange = (city: string) => {
     setForm((f) => ({ ...f, city, district: "" }));
+  };
+
+  const handleImarFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const names = Array.from(files).map((f) => f.name);
+    update("imarBelgeleri", [...(form.imarBelgeleri ?? []), ...names]);
+    e.target.value = "";
+  };
+
+  const removeImarBelge = (name: string) => {
+    update("imarBelgeleri", (form.imarBelgeleri ?? []).filter((n) => n !== name));
   };
 
   return (
@@ -223,6 +237,47 @@ const NewProject = () => {
                 className={`${inputCls} h-auto`}
               />
             </Field>
+
+            {/* İmar Belgeleri */}
+            <div className="space-y-3">
+              <label className="text-xs text-muted-foreground font-medium">İmar Belgesi Ekle</label>
+              <div
+                className="rounded-md border border-dashed border-border bg-secondary/30 p-4 text-center cursor-pointer hover:bg-secondary/50 transition-colors"
+                onClick={() => imarFileRef.current?.click()}
+              >
+                <input
+                  ref={imarFileRef}
+                  type="file"
+                  multiple
+                  accept=".pdf,.png,.jpg,.jpeg,.dwg"
+                  className="hidden"
+                  onChange={handleImarFiles}
+                />
+                <div className="flex flex-col items-center gap-1.5 text-muted-foreground">
+                  <Upload className="h-5 w-5" />
+                  <div className="text-sm font-medium text-foreground">Dosya Yükle</div>
+                  <div className="text-[11px]">PDF, görüntü veya DWG dosyalarını seçin</div>
+                </div>
+              </div>
+
+              {(form.imarBelgeleri ?? []).length > 0 && (
+                <ul className="divide-y divide-border rounded-md border border-border bg-card">
+                  {(form.imarBelgeleri ?? []).map((name, i) => (
+                    <li key={`${name}-${i}`} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                      <span className="truncate font-medium">{name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeImarBelge(name)}
+                        className="p-1.5 rounded hover:bg-destructive/10 text-destructive shrink-0"
+                        title="Kaldır"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </Section>
 
           {/* ── Konut Parametreleri (sadece Konut seçiliyse) ── */}
